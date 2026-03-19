@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Sơ đồ trình tự - School Bus System</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; background: #f0f4f8; color: #334e68; }
+        .container { max-width: 950px; margin: auto; background: white; padding: 50px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: #102a43; border-bottom: 3px solid #627d98; padding-bottom: 15px; }
+        h2 { color: #243b53; margin-top: 50px; border-left: 6px solid #486581; padding-left: 15px; background: #f0f4f8; padding-top: 8px; padding-bottom: 8px; }
+        .description { margin-top: 10px; color: #486581; font-style: italic; }
+        .diagram-box { margin-top: 30px; padding: 20px; border: 1px dashed #bcccdc; border-radius: 8px; background: #fff; }
+        .no-print { position: fixed; bottom: 30px; right: 30px; background: #243b53; color: white; padding: 12px 25px; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        @media print { .no-print { display: none; } .container { box-shadow: none; padding: 20px; } h2 { page-break-before: always; } }
+    </style>
+</head>
+<body>
+    <button class="no-print" onclick="window.print()">Xuất PDF Báo Cáo</button>
+
+    <div class="container">
+        <h1>SƠ ĐỒ TRÌNH TỰ (SEQUENCE DIAGRAM)</h1>
+        <p style="text-align: center;">Mô tả tương tác giữa các lớp (Servlets, DAOs, Database)</p>
+
+        <!-- SEQUENCE 1: LOGIN -->
+        <h2>1. Chức năng Đăng nhập (Login)</h2>
+        <p class="description">Quy trình xác thực người dùng và phân quyền truy cập.</p>
+        <div class="diagram-box">
+            <pre class="mermaid">
+            sequenceDiagram
+                actor User as Người dùng
+                participant View as login.jsp
+                participant Servlet as LoginServlet
+                participant DAO as UserDAO
+                participant DB as SQL Server
+
+                User->>View: Nhập Username/Password
+                View->>Servlet: POST /login (form data)
+                Servlet->>DAO: getUserByCredentials(user, pass)
+                DAO->>DB: SELECT * FROM users WHERE username=?...
+                DB-->>DAO: User Record (Data)
+                DAO-->>Servlet: User Object
+                alt Xác thực thành công
+                    Servlet->>Servlet: Tạo Session (set 'user' attribute)
+                    Servlet-->>User: Redirect to Dashboard (theo Role)
+                else Sai thông tin
+                    Servlet-->>View: Gửi thông báo lỗi (request attribute)
+                    View-->>User: Hiển thị lỗi trên giao diện
+                end
+            </pre>
+        </div>
+
+        <!-- SEQUENCE 2: ATTENDANCE -->
+        <h2>2. Chức năng Điểm danh (Mark Attendance)</h2>
+        <p class="description">Giám sát viên cập nhật trạng thái học sinh trong chuyến đi.</p>
+        <div class="diagram-box">
+            <pre class="mermaid">
+            sequenceDiagram
+                actor Monitor as Giám sát viên
+                participant Page as attendance.jsp
+                participant Servlet as AttendanceServlet
+                participant DAO as AttendanceDAO
+                participant DB as SQL Server
+
+                Monitor->>Page: Chọn trạng thái (PRESENT/ABSENT)
+                Page->>Servlet: POST /attendance?action=update
+                Servlet->>DAO: updateStudentStatus(tripId, studentId, status)
+                DAO->>DB: UPDATE attendances SET status=?...
+                DB-->>DAO: Success
+                DAO-->>Servlet: return true
+                Servlet-->>Page: Refresh data / Show success toast
+                Page-->>Monitor: Hiển thị trạng thái mới cập nhật
+            </pre>
+        </div>
+
+        <!-- SEQUENCE 3: ABSENCE -->
+        <h2>3. Chức năng Báo vắng (Absence Notification)</h2>
+        <p class="description">Phụ huynh gửi đơn báo nghỉ cho con.</p>
+        <div class="diagram-box">
+            <pre class="mermaid">
+            sequenceDiagram
+                actor Parent as Phụ huynh
+                participant Page as absence_form.jsp
+                participant Servlet as AbsenceServlet
+                participant DAO as AbsenceDAO
+                participant DB as SQL Server
+
+                Parent->>Page: Chọn ngày nghỉ & Nhập lý do
+                Page->>Servlet: POST /absence (submit)
+                Servlet->>DAO: insertAbsence(studentId, date, reason)
+                DAO->>DB: INSERT INTO absence_notifications...
+                DB-->>DAO: Created
+                DAO-->>Servlet: Success
+                Servlet->>Servlet: Gửi thông báo tới Admin/Monitor
+                Servlet-->>Page: Hiển thị "Đã gửi thành công"
+                Page-->>Parent: Xem danh sách trạng thái 'Pending'
+            </pre>
+        </div>
+    </div>
+</body>
+</html>

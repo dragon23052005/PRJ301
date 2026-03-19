@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thiết kế Cơ sở dữ liệu - School Bus System</title>
+    <style>
+        body { font-family: 'Times New Roman', Times, serif; line-height: 1.5; padding: 40px; color: #333; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 40px; border: 1px solid #ccc; }
+        h1, h2, h3 { color: #1a2a6c; text-align: center; }
+        h2 { text-align: left; border-bottom: 2px solid #1a2a6c; padding-bottom: 5px; margin-top: 40px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
+        th, td { border: 1px solid #444; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; font-weight: bold; }
+        .pk { color: #d35400; font-weight: bold; }
+        .fk { color: #2980b9; font-weight: bold; }
+        .note { font-style: italic; font-size: 13px; color: #666; }
+        @media print { .no-print { display: none; } body { padding: 0; } .container { border: none; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TÀI LIỆU THIẾT KẾ CƠ SỞ DỮ LIỆU</h1>
+        <p style="text-align: center;">Dự án: <strong>School Bus Management System</strong></p>
+
+        <h2>1. Tổng quan hệ thống</h2>
+        <p>Cơ sở dữ liệu <strong>SchoolBusDB</strong> được thiết kế theo mô hình quan hệ (RDBMS), hỗ trợ quản lý người dùng đa vai trò (Admin, Driver, Monitor, Parent), quản lý lộ trình xe, giám sát học sinh và ghi nhận điểm danh hằng ngày.</p>
+
+        <h2>2. Lược đồ quan hệ (Concepts)</h2>
+        <ul>
+            <li><strong>Quản lý Người dùng:</strong> Lưu trữ tập trung tại bảng <code>users</code>.</li>
+            <li><strong>Hạ tầng Tuyến đường:</strong> Gồm <code>routes</code> (tuyến) và <code>stops</code> (điểm dừng).</li>
+            <li><strong>Vận hành:</strong> Kết nối <code>vehicles</code> với <code>drivers</code>, <code>monitors</code> và <code>routes</code>.</li>
+            <li><strong>Nghiệp vụ học sinh:</strong> <code>students</code> đăng ký tuyến qua <code>registrations</code>.</li>
+            <li><strong>Giám sát:</strong> <code>trips</code> ghi nhận mỗi lượt chạy, <code>attendances</code> lưu trạng thái từng học sinh.</li>
+        </ul>
+
+        <h2>3. Chi tiết các bảng dữ liệu</h2>
+
+        <h3>3.1. Bảng users (Người dùng)</h3>
+        <table>
+            <tr><th>Cột</th><th>Kiểu dữ liệu</th><th>Ràng buộc</th><th>Mô tả</th></tr>
+            <tr><td class="pk">id</td><td>INT</td><td>Primary Key</td><td>Mã định danh duy nhất</td></tr>
+            <tr><td>username</td><td>NVARCHAR(50)</td><td>Unique, Not Null</td><td>Tên đăng nhập</td></tr>
+            <tr><td>password_hash</td><td>VARCHAR(255)</td><td>Not Null</td><td>Mật khẩu đã mã hóa (SHA-1)</td></tr>
+            <tr><td>role</td><td>NVARCHAR(10)</td><td>Check Constraint</td><td>ADMIN, PARENT, MONITOR, DRIVER</td></tr>
+            <tr><td>full_name</td><td>NVARCHAR(100)</td><td>Not Null</td><td>Họ và tên đầy đủ</td></tr>
+        </table>
+
+        <h3>3.2. Bảng routes (Tuyến đường)</h3>
+        <table>
+            <tr><th>Cột</th><th>Kiểu dữ liệu</th><th>Ràng buộc</th><th>Mô tả</th></tr>
+            <tr><td class="pk">id</td><td>INT</td><td>Primary Key</td><td>Mã tuyến</td></tr>
+            <tr><td>route_code</td><td>NVARCHAR(20)</td><td>Unique</td><td>Mã rút gọn (VD: R001)</td></tr>
+            <tr><td>route_name</td><td>NVARCHAR(100)</td><td>Not Null</td><td>Tên lộ trình</td></tr>
+            <tr><td>morning_departure</td><td>TIME</td><td></td><td>Giờ khởi hành sáng</td></tr>
+        </table>
+
+        <h3>3.3. Bảng vehicles (Xe buýt)</h3>
+        <table>
+            <tr><th>Cột</th><th>Kiểu dữ liệu</th><th>Ràng buộc</th><th>Mô tả</th></tr>
+            <tr><td class="pk">id</td><td>INT</td><td>Primary Key</td><td>Mã xe</td></tr>
+            <tr><td>plate_number</td><td>NVARCHAR(20)</td><td>Unique</td><td>Biển số xe</td></tr>
+            <tr><td class="fk">driver_id</td><td>INT</td><td>Foreign Key</td><td>Liên kết tới bảng users (nhân viên lái xe)</td></tr>
+            <tr><td class="fk">monitor_id</td><td>INT</td><td>Foreign Key</td><td>Liên kết tới bảng users (giám sát viên)</td></tr>
+            <tr><td class="fk">route_id</td><td>INT</td><td>Foreign Key</td><td>Tuyến đường xe đang phụ trách</td></tr>
+        </table>
+
+        <h3>3.4. Bảng students & registrations</h3>
+        <p>Lưu trữ thông tin học sinh và liên kết đăng ký tuyến đường.</p>
+        <table>
+            <tr><th>Cột</th><th>Kiểu dữ liệu</th><th>Bảng</th><th>Mô tả</th></tr>
+            <tr><td>parent_id</td><td>INT</td><td>students</td><td>Liên kết tới phụ huynh (users)</td></tr>
+            <tr><td>student_id</td><td>INT</td><td>registrations</td><td>Liên kết tới học sinh</td></tr>
+            <tr><td>stop_id</td><td>INT</td><td>registrations</td><td>Điểm đón/trả đăng ký</td></tr>
+        </table>
+
+        <h3>3.5. Bảng trips (Chuyến đi thực tế)</h3>
+        <table>
+            <tr><th>Cột</th><th>Kiểu dữ liệu</th><th>Mô tả</th></tr>
+            <tr><td>trip_date</td><td>DATE</td><td>Ngày thực hiện chuyến đi</td></tr>
+            <tr><td>trip_type</td><td>NVARCHAR(10)</td><td>MORNING (Sáng đón) hoặc AFTERNOON (Chiều trả)</td></tr>
+            <tr><td>status</td><td>NVARCHAR(15)</td><td>SCHEDULED, DEPARTED, COMPLETED, CANCELLED</td></tr>
+        </table>
+
+        <h3>3.6. Bảng attendances (Điểm danh)</h3>
+        <table>
+            <tr><th>Cột</th><th>Kiểu dữ liệu</th><th>Mô tả</th></tr>
+            <tr><td class="fk">trip_id</td><td>INT</td><td>Liên kết với chuyến đi</td></tr>
+            <tr><td class="fk">student_id</td><td>INT</td><td>Liên kết với học sinh</td></tr>
+            <tr><td>status</td><td>NVARCHAR(20)</td><td>PRESENT, ABSENT, NOTIFIED_ABSENT (Vắng có phép)</td></tr>
+        </table>
+
+        <h2>4. Các quy tắc toàn vẹn (Integrity Rules)</h2>
+        <ol>
+            <li><strong>Tính duy nhất:</strong> <code>username</code>, <code>student_code</code>, <code>plate_number</code> không được trùng lặp.</li>
+            <li><strong>Xóa dữ liệu:</strong> Khi xóa Tuyến đường (<code>routes</code>), các Điểm dừng (<code>stops</code>) thuộc tuyến đó sẽ tự động bị xóa (Cascading Delete).</li>
+            <li><strong>Mặc định:</strong> Trạng thái chuyến đi ban đầu luôn là <code>'SCHEDULED'</code>, trạng thái người dùng là <code>'PARENT'</code>.</li>
+        </ol>
+
+        <p class="no-print" style="text-align: center; color: red; font-weight: bold; border: 2px dashed red; padding: 10px;">
+            Nhấn Ctrl + P để lưu file này dưới dạng PDF cho báo cáo của bạn!
+        </p>
+    </div>
+</body>
+</html>

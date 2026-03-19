@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quy trình nghiệp vụ - School Bus System</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; background: #eceff1; color: #263238; }
+        .page { max-width: 900px; margin: auto; background: white; padding: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; }
+        h1 { text-align: center; color: #1a237e; border-bottom: 2px solid #1a237e; padding-bottom: 10px; }
+        h2 { color: #0d47a1; margin-top: 40px; border-left: 5px solid #0d47a1; padding-left: 15px; }
+        .description { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; font-style: italic; font-size: 0.95em; }
+        .flowchart { display: flex; justify-content: center; margin: 30px 0; padding: 20px; border: 1px solid #eee; border-radius: 10px; }
+        .no-print-btn { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #1a237e; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        @media print { .no-print { display: none; } .page { box-shadow: none; padding: 0; } }
+    </style>
+</head>
+<body>
+    <button class="no-print no-print-btn" onclick="window.print()">In ra PDF/Giấy</button>
+
+    <div class="page">
+        <h1>SƠ ĐỒ QUY TRÌNH NGHIỆP VỤ (FLOWCHART)</h1>
+        <p style="text-align: center;">Hệ thống Quản lý Xe buýt Trường học</p>
+
+        <!-- LUỒNG 1 -->
+        <h2>1. Quy trình Đăng nhập & Kiểm soát quyền hạn</h2>
+        <div class="description">
+            Mô tả: Khi người dùng truy cập hệ thống, Server sẽ kiểm tra thông tin đăng nhập trong bảng <code>users</code>. Dựa vào trường <code>role</code>, hệ thống sẽ điều hướng người dùng đến giao diện chức năng phù hợp.
+        </div>
+        <div class="flowchart">
+            <pre class="mermaid">
+            graph TD
+                A[Bắt đầu: Login] --> B{Nhập tài khoản}
+                B --> C{Kiểm tra DB?}
+                C -- Không khớp --> D[Báo lỗi đăng nhập]
+                D --> B
+                C -- Thành công --> E{Xác định Role?}
+                E -- ADMIN --> F[Trang quản lý tổng thể]
+                E -- MONITOR --> G[Danh sách xe & Điểm danh]
+                E -- DRIVER --> H[Lịch trình lái xe]
+                E -- PARENT --> I[Theo dõi con & Báo nghỉ]
+            </pre>
+        </div>
+
+        <!-- LUỒNG 2 -->
+        <h2>2. Quy trình Vận hành & Điểm danh học sinh</h2>
+        <div class="description">
+            Mô tả: Đây là luồng nghiệp vụ lõi của hệ thống. Tài xế bắt đầu chuyến đi, và Giám sát viên sẽ thực hiện đối soát danh sách học sinh tại mỗi điểm dừng.
+        </div>
+        <div class="flowchart" style="zoom: 0.85;">
+            <pre class="mermaid">
+            graph TD
+                ST[Tài xế bấm 'Departed'] --> VIEW[Monitor mở danh sách HS]
+                VIEW --> ARRIVE[Đến điểm dừng]
+                ARRIVE --> CHK{HS lên xe?}
+                CHK -- Có --> PRES[Mark 'PRESENT']
+                PRES --> TIME[Lưu giờ & Điểm đón]
+                CHK -- Không --> ABS{Có đơn báo nghỉ?}
+                ABS -- Có --> NABS[Mark 'NOTIFIED_ABSENT']
+                ABS -- Không --> UNABS[Mark 'ABSENT']
+                TIME --> NEXT{Hết trạm?}
+                NABS --> NEXT
+                UNABS --> NEXT
+                NEXT -- Còn trạm --> ARRIVE
+                NEXT -- Hoàn thành --> END[Tài xế bấm 'Completed']
+                END --> SAVE[Lưu nhật ký chuyến đi]
+            </pre>
+        </div>
+
+        <!-- LUỒNG 3 -->
+        <h2>3. Quy trình Báo vắng (Absence Notification)</h2>
+        <div class="description">
+            Mô tả: Phụ huynh đăng ký nghỉ cho học sinh qua hệ thống. Thông tin này sẽ tự động cập nhật vào danh sách điểm danh để Giám sát viên không phải đợi tại điểm đón.
+        </div>
+        <div class="flowchart">
+            <pre class="mermaid">
+            graph TD
+                P1[Phụ huynh chọn ngày nghỉ] --> P2[Nhập lý do & Gửi]
+                P2 --> P3[Trạng thái: PENDING]
+                P3 --> A1[Admin/Monitor nhận thông báo]
+                A1 --> A2[Xác nhận 'Acknowledged']
+                A2 --> A3[Tự động cập nhật vào bảng Attendance]
+            </pre>
+        </div>
+    </div>
+</body>
+</html>

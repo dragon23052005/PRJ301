@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kế hoạch Dự án School Bus Management System</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 50px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 10px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        h2 {
+            color: var(--secondary-color);
+            border-left: 5px solid var(--accent-color);
+            padding-left: 15px;
+            margin-top: 30px;
+            background: #f9f9f9;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: var(--accent-color);
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .role-box {
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background: #fff;
+        }
+        .role-name {
+            font-weight: bold;
+            color: #d35400;
+            font-size: 1.1em;
+        }
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+        .checklist li::before {
+            content: "☐ ";
+            color: var(--accent-color);
+        }
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; width: 100%; padding: 20px; }
+            .no-print { display: none; }
+            h2 { page-break-before: always; }
+        }
+        .instruction {
+            background: #e1f5fe;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #b3e5fc;
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print instruction">
+        <strong>💡 Hướng dẫn:</strong> Để có file PDF, hãy nhấn <strong>Ctrl + P</strong> (Windows) và chọn máy in là <strong>"Save as PDF"</strong>.
+    </div>
+
+    <div class="container">
+        <h1>KẾ HOẠCH PHÁT TRIỂN DỰ ÁN</h1>
+        <p style="text-align: center; font-style: italic;">Hệ thống Quản lý Xe buýt Trường học (School Bus Management System)</p>
+
+        <h2>1. Công nghệ & Kiến trúc Hệ thống</h2>
+        <ul>
+            <li><strong>Nền tảng Controller:</strong> Java Servlets</li>
+            <li><strong>Views:</strong> JSP (JavaServer Pages), JSTL, Bootstrap 5</li>
+            <li><strong>Tương tác Database:</strong> JDBC (DAO Pattern)</li>
+            <li><strong>Cơ sở dữ liệu:</strong> SQL Server (SchoolBusDB)</li>
+            <li><strong>Web Server:</strong> Apache Tomcat</li>
+        </ul>
+
+        <h2>2. Phân chia công việc (Nhóm 5 thành viên)</h2>
+        
+        <div class="role-box">
+            <div class="role-name">Thành viên 1: Trưởng nhóm & Hạ tầng (Integrator)</div>
+            <ul>
+                <li>Thiết lập cấu trúc Project, cấu hình DBContext.</li>
+                <li>Xây dựng Module Authentication (Login, Logout, Cookie, Phân quyền).</li>
+                <li>Thiết kế Layout chung (Header, Sidebar, Footer).</li>
+                <li>DAO: UserDAO (phần xác thực).</li>
+            </ul>
+        </div>
+
+        <div class="role-box">
+            <div class="role-name">Thành viên 2: Admin - Quản lý Nhân sự</div>
+            <ul>
+                <li>CRUD Users: Quản lý tài khoản Admin, Driver, Monitor, Parent.</li>
+                <li>CRUD Students: Quản lý thông tin học sinh và liên kết với Phụ huynh.</li>
+                <li>DAO: UserDAO (phần CRUD), StudentDAO.</li>
+            </ul>
+        </div>
+
+        <div class="role-box">
+            <div class="role-name">Thành viên 3: Admin - Quản lý Vận hành</div>
+            <ul>
+                <li>CRUD Routes & Stops (Tuyến đường & Điểm dừng).</li>
+                <li>CRUD Vehicles (Xe buýt).</li>
+                <li>Logic Phân công & Giờ chạy (Trips): Tự động sinh lịch trình.</li>
+                <li>DAO: RouteDAO, VehicleDAO, AssignmentDAO.</li>
+            </ul>
+        </div>
+
+        <div class="role-box">
+            <div class="role-name">Thành viên 4: Module Giám sát (Monitor)</div>
+            <ul>
+                <li>Monitor Dashboard: Hiển thị danh sách chuyến đi trong ngày.</li>
+                <li>Attendance: Điểm danh học sinh theo thời gian thực.</li>
+                <li>DAO: TripDAO, AttendanceDAO.</li>
+            </ul>
+        </div>
+
+        <div class="role-box">
+            <div class="role-name">Thành viên 5: Module Phụ huynh & Tài xế</div>
+            <ul>
+                <li>Parent Portal: Theo dõi xe của con, báo nghỉ (Absence).</li>
+                <li>Driver UI: Cập nhật trạng thái xe (Bắt đầu/Hoàn thành).</li>
+                <li>Kiểm thử (QA): Kiểm tra lỗi tổng thể.</li>
+                <li>DAO: AbsenceDAO.</li>
+            </ul>
+        </div>
+
+        <h2>3. Lộ trình Triển khai</h2>
+        <table>
+            <tr>
+                <th>Giai đoạn</th>
+                <th>Nội dung trọng tâm</th>
+            </tr>
+            <tr>
+                <td>GĐ 1</td>
+                <td>Database, Login Flow, Common Layout</td>
+            </tr>
+            <tr>
+                <td>GĐ 2</td>
+                <td>Hệ thống Admin (Quản lý dữ liệu lõi)</td>
+            </tr>
+            <tr>
+                <td>GĐ 3</td>
+                <td>Nghiệp vụ Monitor, Điểm danh & Tài xế</td>
+            </tr>
+            <tr>
+                <td>GĐ 4</td>
+                <td>Cổng thông tin Phụ huynh & Testing hoàn thiện</td>
+            </tr>
+        </table>
+
+        <h2>4. Checklist quan trọng phòng lỗi</h2>
+        <ul class="checklist">
+            <li>Mọi Servlet phải kiểm tra Session (Redirect nếu chưa login).</li>
+            <li>Sử dụng PreparedStatement để chống SQL Injection.</li>
+            <li>Đóng Connection/ResultSet trong khối finally tại lớp DAO.</li>
+            <li>Kiểm tra đường dẫn nội bộ (/WEB-INF/...) khi Dispatcher.</li>
+        </ul>
+    </div>
+</body>
+</html>
